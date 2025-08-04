@@ -3,17 +3,17 @@
 #Provision
  
 echo "update..."
-sudo apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get update
 echo "update done"
 echo
  
 echo "upgrade..."
-sudo apt upgrade -y
+sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y
 echo "upgrade done"
 echo
  
 echo "install ngnix..."
-sudo apt install nginx -y
+sudo DEBIAN_FRONTEND=noninteractive apt install nginx -y
 echo "nginx install complete"
 echo
  
@@ -24,7 +24,7 @@ echo "node.js install complete"
 echo
  
 echo "cloning git..."
-git clone https://github.com/NasAli2002/tech508-sparta-app.git repo
+git clone https://github.com/NasAli2002/tech508-sparta-app.git repos
 echo "git cloning complete"
 echo
  
@@ -34,6 +34,6 @@ echo "npm install complete"
 echo
  
 #start npm
-npm start
+npm start &
 
 
