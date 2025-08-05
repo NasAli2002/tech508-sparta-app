@@ -27,16 +27,24 @@ echo "cloning git..."
 git clone https://github.com/NasAli2002/tech508-sparta-app.git repos
 echo "git cloning complete"
 echo
+
+cd repos
+
+echo
+export DB_Host=mongodb://172.31.22.81:27017/posts
+echo "DB_Host is set"
+echo
  
 echo "installing npm..."
 npm install
 echo "npm install complete"
 echo
 
+# this helps to make it idempotent by checking for port 3000 running and if it is running it will kill the process and start it again
 echo " Checking if anything is already using port 3000..."
 PID=$(sudo lsof -t -i:3000 || true)
 if [ -n "$PID" ]; then
-  echo " Port 3000 is in use by PID $PID. Killing..."
+  echo " Port 3000 is in use by PID $PID. Killing..."  
   sudo kill $PID
   echo " Port 3000 cleared."
 else
@@ -44,7 +52,19 @@ else
 fi
 echo
 
-#start npm
-npm start &
+##pm2 section
 
+#start npm
+echo "Starting app..."
+npm start &
+echo "App has started in background!"
+echo
+
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
+
+# Update nginx config to reverse proxy to port 3000
+sudo sed -i '/^\s*try_files/c\        proxy_pass http://localhost:3000;' /etc/nginx/sites-available/default
+
+# Restart nginx
+sudo systemctl restart nginx
 
