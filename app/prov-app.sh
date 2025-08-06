@@ -28,10 +28,12 @@ git clone https://github.com/NasAli2002/tech508-sparta-app.git repos
 echo "git cloning complete"
 echo
 
-cd repos
+echo 
+cd repos/app
+echo "changed to app directory"
 
 echo
-export DB_Host=mongodb://172.31.22.81:27017/posts
+export DB_Host=mongodb://172.31.23.78:27017/posts
 echo "DB_Host is set"
 echo
  
@@ -39,6 +41,7 @@ echo "installing npm..."
 npm install
 echo "npm install complete"
 echo
+
 
 # this helps to make it idempotent by checking for port 3000 running and if it is running it will kill the process and start it again
 echo " Checking if anything is already using port 3000..."
@@ -52,13 +55,27 @@ else
 fi
 echo
 
-##pm2 section
+# Global installation of pm2
+echo "installing pm2..."
+npm install -g pm2
+echo "pm2 install complete"
+echo
 
-#start npm
+echo "Ensuring pm2 process idempotent"
+pm2 delete sparta-app || true
+echo
+
+#start pm2
 echo "Starting app..."
-npm start &
+pm2 start npm --name "tech508-sparta-app" -- start
 echo "App has started in background!"
 echo
+
+# start npm
+# echo "Starting app..."
+# npm start &
+# echo "App has started in background!"
+# echo
 
 sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
 

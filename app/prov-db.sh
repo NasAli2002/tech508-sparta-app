@@ -1,6 +1,8 @@
 #!/bin/bash
 
 #Scipt for the database
+
+# Update the package list to make sure the latest versions are installed
 echo "update..."
 sudo DEBIAN_FRONTEND=noninteractive apt-get update
 echo "update done"
