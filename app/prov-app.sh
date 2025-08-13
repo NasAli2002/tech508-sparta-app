@@ -16,6 +16,14 @@ echo "install ngnix..."
 sudo DEBIAN_FRONTEND=noninteractive apt install nginx -y
 echo "nginx install complete"
 echo
+
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
+
+# Update nginx config to reverse proxy to port 3000
+sudo sed -i '/^\s*try_files/c\        proxy_pass http://localhost:3000;' /etc/nginx/sites-available/default
+
+# Restart nginx
+sudo systemctl restart nginx
  
 echo "install node.js..."
 sudo DEBIAN_FRONTEND=noninteractive bash -c "curl -fsSL https://deb.nodesource.com/setup_20.x | bash -" && \
@@ -33,8 +41,8 @@ cd repos/app
 echo "changed to app directory"
 
 echo
-export DB_Host=mongodb://172.31.23.78:27017/posts
-echo "DB_Host is set"
+export DB_HOST=mongodb://172.31.23.78:27017/posts
+echo "DB_HOST is set"
 echo
  
 echo "installing npm..."
@@ -43,17 +51,17 @@ echo "npm install complete"
 echo
 
 
-# this helps to make it idempotent by checking for port 3000 running and if it is running it will kill the process and start it again
-echo " Checking if anything is already using port 3000..."
-PID=$(sudo lsof -t -i:3000 || true)
-if [ -n "$PID" ]; then
-  echo " Port 3000 is in use by PID $PID. Killing..."  
-  sudo kill $PID
-  echo " Port 3000 cleared."
-else
-  echo " Port 3000 is free."
-fi
-echo
+# # this helps to make it idempotent by checking for port 3000 running and if it is running it will kill the process and start it again
+# echo " Checking if anything is already using port 3000..."
+# PID=$(sudo lsof -t -i:3000 || true)
+# if [ -n "$PID" ]; then
+#   echo " Port 3000 is in use by PID $PID. Killing..."  
+#   sudo kill $PID
+#   echo " Port 3000 cleared."
+# else
+#   echo " Port 3000 is free."
+# fi
+# echo
 
 # Global installation of pm2
 echo "installing pm2..."
@@ -68,6 +76,7 @@ echo
 #start pm2
 echo "Starting app..."
 pm2 start npm --name "tech508-sparta-app" -- start
+pm2 save
 echo "App has started in background!"
 echo
 
@@ -77,11 +86,6 @@ echo
 # echo "App has started in background!"
 # echo
 
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
 
-# Update nginx config to reverse proxy to port 3000
-sudo sed -i '/^\s*try_files/c\        proxy_pass http://localhost:3000;' /etc/nginx/sites-available/default
 
-# Restart nginx
-sudo systemctl restart nginx
 
